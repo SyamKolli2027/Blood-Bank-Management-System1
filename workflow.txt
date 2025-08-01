@@ -1,0 +1,36 @@
+Workflow:
+Start the Server
+Stop any running server instance (Ctrl + C).
+Start with:
+powershell
+cd D:\Codes\Blood_Bank_Management_System
+node server.js
+
+Expected output:
+
+🚀 Blood Bank Management Server running on port 3000
+📊 Dashboard: http://localhost:3000/health
+🔗 API Base URL: http://localhost:3000/api
+✅ Connected to MongoDB
+
+Test the Server
+Once the server starts, test an API endpoint:
+
+powershell
+Invoke-WebRequest -Uri "http://localhost:3000/health" -Method Get | Select-Object -ExpandProperty Content
+
+Expected response:
+
+json
+{
+  "status": "OK",
+  "timestamp": "2025-07-23T14:55:00.000Z", // Approx. current UTC time
+  "mongodb": "Connected"
+}
+
+Start http-server and Test Frontend:
+Run:
+
+powershell
+cd D:\Codes\Blood_Bank_Management_System
+http-server -p 8080 --cors -o -c-1
