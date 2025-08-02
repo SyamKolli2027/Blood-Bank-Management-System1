@@ -3,924 +3,628 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blood Bank Management System</title>
+    <title>BloodSave - Advanced Blood Bank Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-:root {
-    --primary-teal: #06b6d4; /* A strong, primary teal */
-    --primary-teal-dark: #0891b2; /* A darker shade for contrast */
-    --secondary-teal: #22d3ee; /* A brighter, more vibrant teal (good for cards) */
-    --accent-teal: #cffafe; /* A very light, almost white teal for accents */
-    --dark-teal: #164e63; /* A deep, rich teal */
-    --light-teal: #f0f9ff; /* A super light teal for backgrounds/cards */
-    
-    --primary-bg: #0f172a; /* Main dark background */
-    --secondary-bg: #1e293b; /* Secondary dark background, could be for dashboard area itself */
-    --card-bg: var(--secondary-teal); /* Vibrant teal for the main stat cards */
-    --glass-bg: rgba(207, 250, 254, 0.1); /* accent-teal with lower opacity for glass effects */
-    
-    --text-primary: #0f172a; /* Dark text for light backgrounds */
-    --text-on-teal: white; /* For text on teal elements */
-    --text-secondary: #64748b;
-    --text-light: #94a3b8;
-    
-    --success: #10b981;
-    --warning: #f59e0b;
-    --danger: #ef4444; /* Keeping danger red as it's a universal alert color */
-    
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, var(--secondary-bg) 0%, var(--primary-bg) 100%); /* Using dark teal backgrounds */
-    min-height: 100vh;
-    color: var(--text-primary); /* Default text color */
-    overflow-x: hidden;
-    position: relative;
-}
-
-/* Enhanced Background Animations */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-        radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%), /* Using primary-teal */
-        radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.15) 0%, transparent 40%), /* Using secondary-teal */
-        radial-gradient(circle at 50% 50%, rgba(22, 78, 99, 0.1) 0%, transparent 50%); /* Using dark-teal */
-    z-index: -1;
-    animation: backgroundPulse 8s ease-in-out infinite, gradientShift 20s ease-in-out infinite;
-}
-
-@keyframes backgroundPulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.02); }
-}
-
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* Enhanced Floating Blood Drops with Mouse Interaction (renamed to 'floating-elements') */
-.floating-elements { /* Renamed for broader use, if you want different shapes */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-}
-
-.floating-element { /* Renamed from .blood-drop */
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: var(--primary-teal); /* Changed from primary-red */
-    border-radius: 50%; /* Simple circle, you can change to 50% 50% 50% 0; transform: rotate(-45deg); for drop shape */
-    opacity: 0.15;
-    animation: float 12s infinite ease-in-out;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.floating-element:hover { /* Renamed from .blood-drop:hover */
-    transform: scale(1.5) rotate(0deg); /* Adjusted for circle */
-    opacity: 0.3;
-    animation: pulseElement 1s ease-in-out infinite; /* Renamed from pulseDrop */
-}
-
-@keyframes pulseElement { /* Renamed from pulseDrop */
-    0%, 100% { transform: scale(1.5); }
-    50% { transform: scale(1.8); }
-}
-
-@keyframes float {
-    from {
-        transform: translateY(-100vh) translateX(-20px); /* Adjusted for circle */
-        opacity: 0;
-    }
-    10% {
-        opacity: 0.15;
-    }
-    90% {
-        opacity: 0.15;
-    }
-    to {
-        transform: translateY(100vh) translateX(20px); /* Adjusted for circle */
-        opacity: 0;
-    }
-}
-
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
-    position: relative;
-    z-index: 1;
-}
-
-.header {
-    background: linear-gradient(135deg, rgba(240, 249, 255, 0.95) 0%, rgba(207, 250, 254, 0.9) 100%); /* Using light-teal and accent-teal for header background */
-    backdrop-filter: blur(20px);
-    border-radius: 24px;
-    padding: 40px 30px;
-    margin-bottom: 40px;
-    text-align: center;
-    box-shadow: var(--shadow-xl);
-    border: 1px solid rgba(6, 182, 212, 0.2); /* Teal border */
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.header:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 25px 50px -12px rgba(6, 182, 212, 0.3); /* Teal shadow */
-}
-
-.header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.2), transparent); /* Teal shimmer */
-    animation: shimmer 2.5s infinite;
-}
-
-@keyframes shimmer {
-    0% { left: -100%; }
-    100% { left: 100%; }
-}
-
-.header h1 {
-    color: var(--primary-teal); /* Changed to primary-teal */
-    font-size: 3.5em;
-    font-weight: 800;
-    margin-bottom: 15px;
-    text-shadow: 2px 2px 8px rgba(6, 182, 212, 0.2); /* Teal shadow */
-    position: relative;
-    z-index: 2;
-    transition: transform 0.3s ease;
-}
-
-.header h1:hover {
-    transform: scale(1.05);
-}
-
-.header h1::after {
-    content: '💙'; /* Changed emoji for theme consistency, or 💧 for water drop */
-    margin-left: 15px;
-    animation: bounce 2s infinite;
-    display: inline-block;
-    transition: transform 0.3s ease;
-}
-
-.header h1:hover::after {
-    transform: rotate(360deg);
-}
-
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-10px); }
-    60% { transform: translateY(-5px); }
-}
-
-.header p {
-    color: var(--text-secondary);
-    font-size: 1.3em;
-    font-weight: 500;
-    position: relative;
-    z-index: 2;
-    transition: color 0.3s ease;
-}
-
-.header p:hover {
-    color: var(--primary-teal); /* Changed to primary-teal */
-}
-
-.nav-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 40px;
-    flex-wrap: wrap;
-    padding: 20px;
-    background: rgba(6, 182, 212, 0.1); /* Transparent primary-teal */
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    border: 1px solid rgba(6, 182, 212, 0.1); /* Transparent primary-teal border */
-    transition: transform 0.3s ease;
-}
-
-.nav-tabs:hover {
-    transform: translateY(-4px);
-}
-
-.nav-tab {
-    background: var(--light-teal); /* Changed from white rgba to light-teal */
-    border: none;
-    padding: 16px 32px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 1.1em;
-    font-weight: 600;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--shadow-md);
-    position: relative;
-    overflow: hidden;
-    color: var(--text-primary);
-}
-
-.nav-tab::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, var(--primary-teal), var(--secondary-teal)); /* Changed from red gradient */
-    transition: left 0.4s ease;
-    z-index: -1;
-}
-
-.nav-tab:hover::before,
-.nav-tab.active::before {
-    left: 0;
-}
-
-.nav-tab:hover,
-.nav-tab.active {
-    color: white;
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: var(--shadow-xl);
-}
-
-.nav-tab:active {
-    transform: translateY(-2px) scale(1.02);
-}
-
-.tab-content {
-    display: none;
-    background: var(--light-teal); /* Changed from white rgba to light-teal */
-    backdrop-filter: blur(20px);
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: var(--shadow-xl);
-    border: 1px solid rgba(6, 182, 212, 0.2); /* Teal border */
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s ease;
-}
-
-.tab-content:hover {
-    transform: translateY(-8px);
-}
-
-.tab-content::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(135deg, var(--primary-teal), var(--secondary-teal)); /* Changed from red gradient */
-    border-radius: 24px 24px 0 0;
-    transition: height 0.3s ease;
-}
-
-.tab-content:hover::before {
-    height: 8px;
-}
-
-.tab-content.active {
-    display: block;
-    animation: slideIn 0.5s ease-out;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.tab-content h2 {
-    color: var(--primary-teal); /* Changed to primary-teal */
-    font-size: 2.5em;
-    font-weight: 700;
-    margin-bottom: 30px;
-    text-align: center;
-    position: relative;
-    transition: transform 0.3s ease, color 0.3s ease;
-}
-
-.tab-content h2:hover {
-    transform: scale(1.05);
-    color: var(--primary-teal-dark); /* Changed to primary-teal-dark */
-}
-
-.tab-content h2::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 4px;
-    background: linear-gradient(135deg, var(--primary-teal), var(--secondary-teal)); /* Changed from red gradient */
-    border-radius: 2px;
-    transition: width 0.3s ease;
-}
-
-.tab-content h2:hover::after {
-    width: 100px;
-}
-
-.form-group {
-    margin-bottom: 25px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: var(--text-primary);
-    font-size: 1.1em;
-    transition: color 0.3s ease;
-}
-
-.form-group label:hover {
-    color: var(--primary-teal); /* Changed to primary-teal */
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 16px 20px;
-    border: 2px solid var(--accent-teal); /* Changed border color */
-    border-radius: 12px;
-    font-size: 1.1em;
-    transition: all 0.3s ease;
-    background: var(--light-teal); /* Changed from white rgba to light-teal */
-    backdrop-filter: blur(10px);
-    color: var(--text-primary); /* Ensure input text color is visible */
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--primary-teal); /* Changed to primary-teal */
-    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1); /* Teal shadow */
-    transform: translateY(-2px) scale(1.02);
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px;
-}
-
-.btn {
-    background: linear-gradient(135deg, var(--primary-teal), var(--secondary-teal)); /* Changed from red gradient */
-    color: white;
-    border: none;
-    padding: 16px 40px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 1.1em;
-    font-weight: 600;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--shadow-lg);
-    position: relative;
-    overflow: hidden;
-}
-
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.2); /* White sparkle on hover */
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.4s ease, height 0.4s ease;
-}
-
-.btn:hover::before {
-    width: 300px;
-    height: 300px;
-}
-
-.btn:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: var(--shadow-xl);
-}
-
-.btn:active {
-    transform: translateY(-2px) scale(1.02);
-}
-
-.btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.btn-secondary {
-    background: linear-gradient(135deg, var(--text-secondary), var(--text-light)); /* Using text-secondary for a muted look */
-    color: white; /* Ensure text is visible on secondary button */
-}
-
-.cards-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 25px;
-    margin-top: 30px;
-}
-
-.card {
-    background: var(--light-teal); /* Changed from white rgba to light-teal */
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: var(--shadow-lg);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid var(--accent-teal); /* Light teal border */
-    position: relative;
-    overflow: hidden;
-    color: var(--text-primary); /* Default text color for cards */
-}
-
-.card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 6px;
-    background: linear-gradient(135deg, var(--primary-teal), var(--secondary-teal)); /* Changed from red gradient */
-    transform: scaleX(0);
-    transition: transform 0.4s ease;
-}
-
-.card:hover::before {
-    transform: scaleX(1);
-}
-
-.card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: var(--shadow-xl);
-    background: var(--accent-teal); /* Lighter teal on hover for card */
-}
-
-.card h3 {
-    color: var(--primary-teal-dark); /* Changed to primary-teal-dark for headings */
-    margin-bottom: 15px;
-    font-size: 1.4em;
-    font-weight: 700;
-    transition: transform 0.3s ease;
-}
-
-.card h3:hover {
-    transform: translateX(5px);
-}
-
-.blood-type {
-    display: inline-block;
-    background: linear-gradient(135deg, var(--primary-teal), var(--secondary-teal)); /* Changed from red gradient */
-    color: var(--text-on-teal); /* White text on teal */
-    padding: 8px 20px;
-    border-radius: 25px;
-    font-weight: 700;
-    margin-bottom: 15px;
-    font-size: 1.1em;
-    box-shadow: var(--shadow-md);
-    animation: pulse 2s infinite;
-    transition: transform 0.3s ease;
-}
-
-.blood-type:hover {
-    transform: scale(1.1);
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-.status {
-    display: inline-block;
-    padding: 8px 20px;
-    border-radius: 25px;
-    font-weight: 700;
-    margin-bottom: 15px;
-    font-size: 0.95em;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.3s ease;
-}
-
-.status:hover {
-    transform: scale(1.1);
-}
-
-.status.available {
-    background: linear-gradient(135deg, var(--success), #10b981);
-    color: white;
-}
-
-.status.critical {
-    background: linear-gradient(135deg, var(--warning), #f59e0b);
-    color: white;
-}
-
-.status.out-of-stock {
-    background: linear-gradient(135deg, var(--danger), #ef4444);
-    color: white;
-}
-
-.status.low {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: white;
-}
-
-.status.medium {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
-}
-
-.status.high {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: white;
-}
-
-.status.pending {
-    background: linear-gradient(135deg, #6b7280, #4b5563);
-    color: white;
-}
-
-.status.approved {
-    background: linear-gradient(135deg, var(--success), #10b981);
-    color: white;
-}
-
-.status.rejected {
-    background: linear-gradient(135deg, var(--danger), #ef4444);
-    color: white;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 25px;
-    margin-top: 30px;
-}
-
-.stat-card {
-    background: linear-gradient(135deg, var(--primary-teal), var(--primary-teal-dark)); /* Changed from red gradient */
-    color: white;
-    padding: 35px 25px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: var(--shadow-xl);
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent); /* White sparkle on teal */
-    transform: rotate(45deg);
-    animation: sparkle 3s infinite;
-}
-
-.stat-card:hover::before {
-    animation: sparkleFast 1.5s infinite;
-}
-
-@keyframes sparkle {
-    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-}
-
-@keyframes sparkleFast {
-    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-}
-
-.stat-card:hover {
-    transform: translateY(-8px) scale(1.05);
-    box-shadow: 0 25px 50px -12px rgba(6, 182, 212, 0.4); /* Teal shadow */
-}
-
-.stat-card h3 {
-    font-size: 3em;
-    margin-bottom: 10px;
-    font-weight: 800;
-    position: relative;
-    z-index: 2;
-    transition: transform 0.3s ease;
-}
-
-.stat-card h3:hover {
-    transform: scale(1.1);
-}
-
-.stat-card p {
-    font-size: 1.2em;
-    font-weight: 600;
-    position: relative;
-    z-index: 2;
-    transition: transform 0.3s ease;
-}
-
-.stat-card p:hover {
-    transform: translateY(-2px);
-}
-
-.alert {
-    padding: 20px 25px;
-    margin-bottom: 25px;
-    border-radius: 15px;
-    font-weight: 600;
-    font-size: 1.1em;
-    box-shadow: var(--shadow-md);
-    border-left: 6px solid;
-    animation: slideInAlert 0.5s ease-out;
-    transition: transform 0.3s ease;
-}
-
-.alert:hover {
-    transform: translateX(5px);
-}
-
-@keyframes slideInAlert {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes slideOutAlert {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-}
-
-.alert.success {
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-    color: #065f46;
-    border-left-color: var(--success);
-}
-
-.alert.error {
-    background: linear-gradient(135deg, #fef2f2, #fecaca); /* Still uses light red tint for errors */
-    color: #7f1d1d;
-    border-left-color: var(--danger);
-}
-
-.loading {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-secondary);
-    font-size: 1.2em;
-}
-
-.loading::before {
-    content: '';
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    border: 4px solid rgba(6, 182, 212, 0.1); /* Teal border for loading spinner */
-    border-left-color: var(--primary-teal); /* Changed to primary-teal */
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 15px;
-    transition: transform 0.3s ease;
-}
-
-.loading:hover::before {
-    transform: scale(1.2);
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-@media (max-width: 768px) {
-    .container {
-        padding: 15px;
-    }
-
-    .header {
-        padding: 30px 20px;
-    }
-
-    .header h1 {
-        font-size: 2.5em;
-    }
-
-    .nav-tabs {
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .nav-tab {
-        width: 100%;
-        max-width: 300px;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .cards-container {
-        grid-template-columns: 1fr;
-    }
-
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .tab-content {
-        padding: 25px 20px;
-    }
-}
-
-@media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .stat-card h3 {
-        font-size: 2.5em;
-    }
-}
-
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(6, 182, 212, 0.1); /* Transparent teal track */
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--primary-teal), var(--secondary-teal)); /* Changed from red gradient */
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, var(--primary-teal-dark), var(--primary-teal)); /* Darker teal on hover */
-}
-
-.form-group input:valid {
-    border-color: var(--success);
-}
-
-.form-group input:invalid:not(:placeholder-shown) {
-    border-color: var(--danger);
-}
-
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        animation: none !important;
-        transition: none !important;
-    }
-}
-
-/* New Particle Animation for Interactive Background */
-.particle-system {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -2;
-}
-
-.particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: var(--secondary-teal); /* Changed from secondary-red */
-    border-radius: 50%;
-    opacity: 0.3;
-    animation: particleFloat 10s infinite ease-in-out;
-}
-
-.particle:hover {
-    transform: scale(1.5);
-    opacity: 0.5;
-    animation: particlePulse 0.5s ease-in-out infinite;
-}
-
-@keyframes particleFloat {
-    0% { transform: translateY(0) translateX(0); opacity: 0.3; }
-    50% { transform: translateY(-20px) translateX(10px); opacity: 0.5; }
-    100% { transform: translateY(0) translateX(0); opacity: 0.3; }
-}
-
-@keyframes particlePulse {
-    0%, 100% { transform: scale(1.5); }
-    50% { transform: scale(2); }
-}
+        /* Base Styles & Utility */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        /* New Color Palette Variables */
+        :root {
+            --primary-color: #008080; /* Strong Teal */
+            --primary-dark: #005f5f; /* Darker Teal */
+            --secondary-color: #ffd700; /* Gold/Yellow for highlights/accents */
+            --light-bg: #f5fbfb; /* Very light teal-tinted background */
+            --light-card-bg: #e0fafa; /* Light cyan for cards */
+            --text-dark: #2f4f4f; /* Dark Slate Gray for main text */
+            --text-muted: #696969; /* Dim Gray for secondary text */
+            --border-light: #b0e0e6; /* Powder Blue border */
+            
+            /* Status Colors (adjusted for new theme) */
+            --status-available: #28a745; /* Green */
+            --status-low: #ffc107; /* Orange */
+            --status-critical: #dc3545; /* Red */
+            --status-pending: #17a2b8; /* Info Blue */
+            --status-fulfilled: #6f42c1; /* Purple */
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-bg); /* Use new light background */
+            color: var(--text-dark); /* Use new dark text color */
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 35px auto;
+            background: #fff; /* Keep white for container base */
+            border-radius: 15px;
+            box-shadow: 0 8px 36px rgba(0,0,0,0.08); /* Subtle shadow */
+            overflow: hidden;
+            border: 1px solid var(--border-light); /* New light border */
+        }
+
+        /* Header Styling */
+        .header {
+            background: var(--primary-color); /* Use primary teal */
+            color: white;
+            padding: 2.5rem 1rem 2rem 1rem;
+            text-align: center;
+            border-bottom: 4px solid var(--primary-dark); /* Darker teal accent line */
+        }
+        .header h1 {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 0.5em;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #e0fafa; /* Lighter white for subtitle */
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: var(--light-card-bg); /* Use light teal for tabs background */
+            border-bottom: 2px solid var(--border-light); /* Subtle separator line */
+            flex-wrap: wrap;
+        }
+        .nav-tab {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 18px;
+            background: none;
+            border: none;
+            font-size: 1.04em;
+            font-weight: 600;
+            color: var(--primary-dark); /* Darker teal for inactive tabs */
+            cursor: pointer;
+            border-radius: 0;
+            outline: none;
+            transition: background 0.2s, color 0.2s, border-bottom 0.2s;
+        }
+
+        .nav-tab.active, .nav-tab:hover {
+            background: #ccfafa; /* Lighter teal on hover/active */
+            color: var(--primary-color); /* Primary teal for active tab text */
+            border-bottom: 2px solid var(--primary-color); /* Active tab indicator */
+        }
+
+        /* Content Area */
+        .content {
+            padding: 35px 32px;
+            background: #fff;
+        }
+
+        /* Tab Content Sections */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Dashboard Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 25px;
+            margin-bottom: 32px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: var(--light-card-bg); /* Use light teal for stat cards */
+            color: var(--text-dark);
+            padding: 2em 1.4em;
+            border-radius: 13px;
+            box-shadow: 0 2px 14px rgba(0,128,128,0.07); /* Teal-tinted shadow */
+            text-align: center;
+            transition: transform .18s ease-out;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.6em;
+            font-weight: 700;
+            color: var(--primary-dark); /* Darker teal for numbers */
+            margin-bottom: .3em;
+        }
+
+        .stat-label {
+            font-size: 1.07em;
+            color: var(--text-muted); /* Muted text for labels */
+        }
+
+        /* Table Styling */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 11px;
+            margin-top: 18px;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.05);
+            background: #fff; /* Keep white for table backgrounds */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            font-size: 1.0em;
+        }
+
+        th, td {
+            padding: 18px;
+            text-align: left;
+            border-bottom: 1px solid #f0f8ff; /* Very light blue for dividers */
+        }
+
+        th {
+            background: #f0fafa; /* Light teal for table headers */
+            color: var(--primary-dark); /* Darker teal for header text */
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85em;
+        }
+
+        tr {
+            transition: background 0.25s ease-out;
+        }
+
+        tr:hover {
+            background: #e6f7f7; /* Lighter teal on row hover */
+        }
+
+        /* Blood Type and Status Badges */
+        .blood-type {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 13px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9em;
+            background: var(--primary-color); /* Primary teal for blood type */
+        }
+
+        .status {
+            padding: 7px 12px;
+            border-radius: 11px;
+            font-weight: 700;
+            font-size: 0.88em;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        /* Specific Status Colors */
+        .status.available { background: #d4edda; color: var(--status-available); } /* Light Green */
+        .status.low { background: #fff3cd; color: var(--status-low); } /* Light Orange */
+        .status.critical { background: #f8d7da; color: var(--status-critical); } /* Light Red */
+        .status.pending { background: #d1ecf1; color: var(--status-pending); } /* Light Info Blue */
+        .status.fulfilled { background: #e2d8f2; color: var(--status-fulfilled); } /* Light Purple */
+        .status.used { background: #e9ecef; color: var(--text-muted); } /* Grey for used */
+        .status.expired { background: #fdf5f5; color: var(--status-critical); } /* Light red for expired */
+
+
+        /* Buttons */
+        .btn {
+            background: var(--primary-dark); /* Darker teal for primary buttons */
+            color: white;
+            border: none;
+            padding: 13px 28px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background 0.18s, transform .18s ease-out;
+            margin-right: 10px;
+        }
+        .btn:last-child {
+            margin-right: 0;
+        }
+        .btn:hover {
+            background: var(--primary-color); /* Primary teal on hover */
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: var(--status-critical); /* Red for destructive actions */
+        }
+        .btn-danger:hover {
+            background: #c82333; /* Darker red */
+        }
+        .btn-secondary {
+            background: var(--text-muted); /* Grey for secondary actions */
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: #545b62; /* Darker grey */
+        }
+
+        /* Form Elements */
+        input, select, textarea {
+            width: 100%;
+            padding: 13px 17px;
+            border: 2px solid var(--border-light); /* New light border */
+            border-radius: 10px;
+            font-size: 1.04em;
+            background: #fdfafa; /* Very light background for inputs */
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 6px;
+            transition: border-color .2s, background .2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color); /* Primary teal border on focus */
+            background: #fff;
+            outline: none;
+        }
+
+        label {
+            font-weight: 600;
+            color: var(--primary-dark); /* Darker teal for labels */
+            margin-bottom: 8px;
+            display: block;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4); /* Darker overlay */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #fff; /* Keep white for modal content */
+            padding: 38px 40px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.15); /* Slightly stronger shadow */
+            border: 1.5px solid var(--border-light);
+            width: 95%;
+            max-width: 500px;
+        }
+        .modal h2 {
+            color: var(--primary-dark); /* Darker teal for modal headings */
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.8em;
+        }
+        .close {
+            position: absolute;
+            right: 18px; top: 18px;
+            color: var(--text-muted);
+            font-size: 2rem;
+            cursor: pointer;
+            font-weight: 700;
+            transition: color 0.2s, background 0.2s;
+        }
+        .close:hover {
+            color: var(--status-critical);
+            background: #fcf0f0;
+            border-radius: 50%;
+        }
+
+        /* Alert styles */
+        .alert {
+            padding: 15px 24px;
+            border-radius: 8px;
+            font-size: 1.05em;
+            font-weight: 500;
+            margin-bottom: 18px;
+            border-left: 6px solid #aaa;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: var(--status-available);
+            border-left: 6px solid var(--status-available);
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: var(--status-critical);
+            border-left: 6px solid var(--status-critical);
+        }
+        .alert-info {
+            background: #d1ecf1;
+            color: var(--status-pending);
+            border-left: 6px solid var(--status-pending);
+        }
+
+
+        /* Footer styles */
+        .footer {
+            background: var(--primary-dark); /* Darker teal for footer */
+            color: #e0fafa;
+            padding: 30px;
+            margin-top: 55px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: flex-start;
+            gap: 30px;
+        }
+        .footer-section {
+            flex: 1;
+            min-width: 280px;
+            max-width: 45%;
+        }
+        .footer-section h3 {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.3em;
+            margin-bottom: 13px;
+        }
+        .footer-section p, .footer-section li {
+            line-height: 1.7;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        .footer-section a {
+            color: #e0fafa;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer-section a:hover {
+            color: #fff;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            width: 100%;
+            margin-top: 25px;
+            padding-top: 15px;
+            font-size: 0.9em;
+            color: #cce9e9;
+            border-top: 1px solid #004a4a; /* Darker teal border */
+        }
+
+        /* Search Box */
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            padding: 12px 15px;
+            font-size: 1em;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 800px) {
+            .stats-grid { 
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 15px;
+            }
+            .content { padding: 15px; }
+            .header h1 { font-size: 2.2em; }
+            .header p { font-size: 1em; }
+            .modal-content { max-width: 90%; padding: 25px; }
+            .footer-section { min-width: 100%; max-width: 100%; text-align: center; }
+        }
+        @media (max-width: 500px) {
+            .nav-tabs { flex-direction: column; }
+            .nav-tab { min-width: unset; }
+            .header h1 { font-size: 1.8em; }
+        }
+
+        /* General Heading Styles within Content */
+        .content h2 {
+            color: var(--primary-dark); /* Darker teal for content headings */
+            font-size: 1.7em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-light);
+            padding-bottom: 10px;
+        }
+        /* Style for About section paragraphs */
+        #about p {
+            margin-bottom: 1em;
+            color: var(--text-dark);
+        }
+        #about ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            color: var(--text-dark);
+        }
+        #about li {
+            margin-bottom: 0.5em;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>💧 Blood Bank Management System</h1>
-            <p>Saving Lives Through Efficient Blood Management</p>
+            <h1>🩸 BloodSave</h1>
+            <p>Advanced Blood Bank Management • Saving Lives Through Innovation</p>
         </div>
 
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('dashboard')">Dashboard</button>
-            <button class="nav-tab" onclick="showTab('donors')">Donors</button>
-            <button class="nav-tab" onclick="showTab('recipients')">Recipients</button>
-            <button class="nav-tab" onclick="showTab('inventory')">Inventory</button>
-            <button class="nav-tab" onclick="showTab('requests')">Requests</button>
-        </div>
+            <button class="nav-tab active" data-tab="dashboard">Dashboard</button>
+            <button class="nav-tab" data-tab="donors">Donors</button>
+            <button class="nav-tab" data-tab="inventory">Inventory</button>
+            <button class="nav-tab" data-tab="requests">Requests</button>
+            <button class="nav-tab" data-tab="about">About Us</button> </div>
 
-        <div id="dashboard" class="tab-content active">
-            <h2>Dashboard</h2>
-            <div id="dashboardStats" class="stats-grid">
-                <div class="stat-card">
-                    <h3 id="totalDonors">0</h3>
-                    <p>Total Donors</p>
+        <div class="content">
+            <div id="dashboard" class="tab-content active">
+                <h2>System Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalDonors">0</div>
+                        <div class="stat-label">Total Donors</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalUnits">0</div>
+                        <div class="stat-label">Blood Units</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="pendingRequests">0</div>
+                        <div class="stat-label">Pending Requests</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="criticalLevels">0</div>
+                        <div class="stat-label">Critical Levels</div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3 id="totalRecipients">0</h3>
-                    <p>Total Recipients</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="totalUnits">0</h3>
-                    <p>Blood Units Available</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="pendingRequests">0</h3>
-                    <p>Pending Requests</p>
+
+                <h3>Blood Inventory Overview</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Blood Type</th>
+                                <th>Available Units</th>
+                                <th>Status</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryOverview">
+                            </tbody>
+                    </table>
                 </div>
             </div>
-            <div id="bloodTypeStats" class="cards-container">
-                </div>
-        </div>
 
-        <div id="donors" class="tab-content">
-            <h2>Donor Management</h2>
-            <div id="donorAlert"></div>
-            <form id="donorForm">
+            <div id="donors" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Donor Management</h2>
+                    <button class="btn" id="addDonorBtn">Add New Donor</button> </div>
+
+                <div class="search-box">
+                    <input type="text" placeholder="Search donors by name or blood type..." id="donorSearch">
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Donor ID</th>
+                                <th>Name</th>
+                                <th>Blood Type</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Last Donation</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="donorsTable">
+                            <tr><td colspan="7" class="alert alert-info" style="text-align: center;">Loading donors...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="inventory" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Blood Inventory</h2>
+                    <button class="btn" id="addBloodUnitBtn">Add Blood Unit</button> </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Blood Type</th>
+                                <th>Units</th> <th>Donor Name</th>
+                                <th>Collection Date</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTable">
+                            <tr><td colspan="7" class="alert alert-info" style="text-align: center;">Loading inventory...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="requests" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Blood Requests</h2>
+                    <button class="btn" id="newRequestBtn">New Request</button> </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Blood Type</th>
+                                <th>Units Needed</th>
+                                <th>Hospital</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestsTable">
+                            <tr><td colspan="7" class="alert alert-info" style="text-align: center;">Loading requests...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="about" class="tab-content">
+                <h2>About BloodSave</h2>
+                <p>BloodSave is a cutting-edge blood bank management system designed to streamline blood donation processes and save lives through efficient inventory management. Our platform connects donors, hospitals, and blood banks in a seamless digital ecosystem.</p>
+                <p>Founded in 2024, we are committed to revolutionizing healthcare through innovative technology solutions that make blood donation and distribution more accessible and efficient.</p>
+                <h3>Our Mission</h3>
+                <p>To ensure that every person in need of blood receives it in a timely manner, by empowering blood banks with smart, real-time management tools.</p>
+                <h3>Our Values</h3>
+                <ul>
+                    <li><strong>Integrity:</strong> Upholding the highest standards of ethics and transparency.</li>
+                    <li><strong>Innovation:</strong> Continuously seeking new ways to improve blood management.</li>
+                    <li><strong>Compassion:</strong> Driven by the profound impact of saving lives.</li>
+                    <li><strong>Efficiency:</strong> Optimizing processes to maximize blood availability.</li>
+                </ul>
+                <h3>Connect With Us</h3>
+                <p>We are always eager to collaborate with healthcare providers, non-profits, and technology enthusiasts to further our mission. Reach out to discuss partnerships, volunteer opportunities, or just to learn more about what we do.</p>
+            </div>
+
+        </div> </div> <div id="donorModal" class="modal">
+        <div class="modal-content">
+            <span class="close" data-modal-id="donorModal">&times;</span>
+            <h2>Add New Donor</h2>
+            <div id="donorModalAlert"></div> <form id="donorForm">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="donorName">Full Name</label>
-                        <input type="text" id="donorName" required>
+                        <input type="text" id="donorName" required placeholder="e.g., Jane Doe">
                     </div>
                     <div class="form-group">
                         <label for="donorAge">Age</label>
-                        <input type="number" id="donorAge" min="18" max="65" required>
+                        <input type="number" id="donorAge" required min="18" max="65" placeholder="18-65 years">
                     </div>
+                </div>
+                <div class="form-row">
                     <div class="form-group">
                         <label for="donorBloodType">Blood Type</label>
                         <select id="donorBloodType" required>
@@ -935,93 +639,33 @@ body::before {
                             <option value="O-">O-</option>
                         </select>
                     </div>
-                </div>
-                <div class="form-row">
                     <div class="form-group">
                         <label for="donorPhone">Phone Number</label>
-                        <input type="tel" id="donorPhone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="donorEmail">Email</label>
-                        <input type="email" id="donorEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="donorAddress">Address</label>
-                        <textarea id="donorAddress" rows="3" required></textarea>
-                    </div>
-                </div>
-                <button type="submit" class="btn">Register Donor</button>
-            </form>
-            <div id="donorsList" class="cards-container">
-                </div>
-        </div>
-
-        <div id="recipients" class="tab-content">
-            <h2>Recipient Management</h2>
-            <div id="recipientAlert"></div>
-            <form id="recipientForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="recipientName">Full Name</label>
-                        <input type="text" id="recipientName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="recipientAge">Age</label>
-                        <input type="number" id="recipientAge" min="1" max="120" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="recipientBloodType">Blood Type</label>
-                        <select id="recipientBloodType" required>
-                            <option value="">Select Blood Type</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="recipientPhone">Phone Number</label>
-                        <input type="tel" id="recipientPhone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="recipientHospital">Hospital</label>
-                        <input type="text" id="recipientHospital" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="recipientUnits">Units Required</label>
-                        <input type="number" id="recipientUnits" min="1" max="10" required>
+                        <input type="tel" id="donorPhone" required placeholder="e.g., 123-456-7890">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="recipientUrgency">Urgency Level</label>
-                    <select id="recipientUrgency" required>
-                        <option value="">Select Urgency</option>
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
-                        <option value="Critical">Critical</option>
-                    </select>
+                    <label for="donorEmail">Email</label>
+                    <input type="email" id="donorEmail" required placeholder="e.g., jane.doe@example.com">
                 </div>
-                <button type="submit" class="btn">Register Recipient</button>
+                <div class="form-group">
+                    <label for="donorAddress">Address</label>
+                    <textarea id="donorAddress" rows="3" required placeholder="Full mailing address"></textarea>
+                </div>
+                <button type="submit" class="btn">Add Donor</button>
             </form>
-            <div id="recipientsList" class="cards-container">
-                </div>
         </div>
+    </div>
 
-        <div id="inventory" class="tab-content">
-            <h2>Blood Inventory</h2>
-            <div id="inventoryAlert"></div>
-            <form id="inventoryForm">
+    <div id="bloodModal" class="modal">
+        <div class="modal-content">
+            <span class="close" data-modal-id="bloodModal">&times;</span>
+            <h2>Add Blood Unit</h2>
+            <div id="bloodModalAlert"></div> <form id="bloodForm">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="inventoryBloodType">Blood Type</label>
-                        <select id="inventoryBloodType" required>
+                        <label for="bloodType">Blood Type</label>
+                        <select id="bloodType" required>
                             <option value="">Select Blood Type</option>
                             <option value="A+">A+</option>
                             <option value="A-">A-</option>
@@ -1034,424 +678,657 @@ body::before {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="inventoryUnits">Units</label>
-                        <input type="number" id="inventoryUnits" min="1" required>
+                        <label for="bloodUnits">Units</label>
+                        <input type="number" id="bloodUnits" required min="1" placeholder="Number of units">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="donorSelect">Select Donor</label>
+                        <select id="donorSelect" required>
+                            <option value="">Loading Donors...</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label for="inventoryExpiryDate">Expiry Date</label>
-                        <input type="date" id="inventoryExpiryDate" required>
+                        <label for="collectionDate">Collection Date</label>
+                        <input type="date" id="collectionDate" required>
                     </div>
                 </div>
-                <button type="submit" class="btn">Add to Inventory</button>
+                <div class="form-group">
+                    <label for="expiryDate">Expiry Date</label>
+                    <input type="date" id="expiryDate" required>
+                </div>
+                <button type="submit" class="btn">Add Blood Unit</button>
             </form>
-            <div id="inventoryList" class="cards-container">
-                </div>
         </div>
+    </div>
 
-        <div id="requests" class="tab-content">
-            <h2>Blood Requests</h2>
-            <div id="requestsAlert"></div>
-            <div id="requestsList" class="cards-container">
+    <div id="requestModal" class="modal">
+        <div class="modal-content">
+            <span class="close" data-modal-id="requestModal">&times;</span>
+            <h2>New Blood Request</h2>
+            <div id="requestModalAlert"></div> <form id="requestForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="patientName">Patient Name</label>
+                        <input type="text" id="patientName" required placeholder="e.g., John Smith">
+                    </div>
+                    <div class="form-group">
+                        <label for="requestBloodType">Blood Type</label>
+                        <select id="requestBloodType" required>
+                            <option value="">Select Blood Type</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="unitsNeeded">Units Needed</label>
+                        <input type="number" id="unitsNeeded" min="1" required placeholder="Number of units">
+                    </div>
+                    <div class="form-group">
+                        <label for="priority">Priority</label>
+                        <select id="priority" required>
+                            <option value="">Select Priority</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="hospital">Hospital</label>
+                    <input type="text" id="hospital" required placeholder="e.g., City General Hospital">
+                </div>
+                <button type="submit" class="btn">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <ul>
+                <li><strong>Address:</strong> 123 Healthcare Avenue, Medical District, New York, NY 10001</li>
+                <li><strong>Phone:</strong> +1 (555) 123-BLOOD</li>
+                <li><strong>Email:</strong> <a href="mailto:contact@BloodSave.com">contact@BloodSave.com</a></li>
+                <li><strong>Emergency Hotline:</strong> +1 (555) 911-HELP</li>
+                <li><strong>Office Hours:</strong> 24/7 Emergency Support</li>
+                <li><strong>Support:</strong> <a href="mailto:support@BloodSave.com">support@BloodSave.com</a></li>
+            </ul>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 BloodSave. All rights reserved. | Saving Lives Through Technology</p>
         </div>
     </div>
 
     <script>
-        // API Base URL
-        const API_BASE = 'http://localhost:3000/api';
+        // API Base URL - THIS IS CRUCIAL. Ensure it's correct for your backend.
+        // If you are running YOUR OWN server.js locally, this should be 'http://localhost:3000/api'.
+        // If you are relying on your friend's online Render.com deployment, keep it as below.
+        const API_BASE = 'http://localhost:3000/api'; // Changed to local to match the server.js I provided
 
-        // Tab Management
-        function showTab(tabName) {
-            const tabs = document.querySelectorAll('.tab-content');
-            const navTabs = document.querySelectorAll('.nav-tab');
-            
-            tabs.forEach(tab => tab.classList.remove('active'));
-            navTabs.forEach(tab => tab.classList.remove('active'));
-            
-            document.getElementById(tabName).classList.add('active');
-            // The 'event' object is implicit in event handlers
-            // In modern JS, it's better to pass it explicitly: showTab(tabName, event)
-            // For now, assuming it's available in the global scope from the onclick attribute
-            if (event && event.target) {
-                event.target.classList.add('active');
+
+        // --- Helper Functions for UI and Data Handling ---
+
+        /**
+         * Generic function to display alerts (success/error/info) to the user.
+         * @param {string} message - The message to display.
+         * @param {string} type - 'success', 'error', or 'info' for styling.
+         * @param {string} targetContainerId - ID of the element to prepend the alert to. Defaults to '.content' first child.
+         */
+        function showAlert(message, type = 'info', targetContainerId = null) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+
+            let targetContainer;
+            if (targetContainerId) {
+                targetContainer = document.getElementById(targetContainerId);
             } else {
-                // Fallback for direct calls or if event isn't available
-                document.querySelector(`.nav-tab[onclick*="showTab('${tabName}')"]`).classList.add('active');
+                targetContainer = document.querySelector('.content');
             }
-            
-            // Load data for active tab
-            switch(tabName) {
+
+            if (targetContainer) {
+                // Remove any existing alerts in this container before adding a new one
+                Array.from(targetContainer.children).forEach(child => {
+                    if (child.classList.contains('alert')) {
+                        child.remove();
+                    }
+                });
+                targetContainer.prepend(alertDiv); // Add to the top of the container
+                setTimeout(() => {
+                    alertDiv.remove(); // Auto-remove after 5 seconds
+                }, 5000);
+            } else {
+                console.error(`Alert container "${targetContainerId || '.content'}" not found for alert: ${message}`);
+            }
+        }
+
+        /**
+         * Formats a date string into a readable local date.
+         * Handles null/invalid dates gracefully.
+         * @param {string|null|undefined} dateString - The date string to format.
+         * @returns {string} Formatted date or 'N/A' / 'Invalid Date'.
+         */
+        function formatReadableDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return 'Invalid Date'; // Check for invalid date
+
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        /**
+         * Truncates a long ID string for display purposes.
+         * @param {string} id - The MongoDB ObjectID string.
+         * @returns {string} Shortened ID with ellipsis.
+         */
+        function shortenId(id) {
+            if (!id || id.length < 8) return id; // Don't shorten very short IDs
+            return `${id.substring(0, 4)}...${id.substring(id.length - 4)}`;
+        }
+
+        // --- API Communication Functions ---
+
+        /**
+         * Makes an asynchronous call to the backend API.
+         * This version expects the API to return a JSON object with a 'success' boolean
+         * and a 'data' array/object for successful responses, or 'error'/'message' for failures.
+         * @param {string} endpoint - The API endpoint relative to API_BASE.
+         * @param {string} method - HTTP method (GET, POST, PUT, DELETE).
+         * @param {object|null} data - Request body data (for POST/PUT).
+         * @returns {Promise<object|null>} The parsed JSON response or null on network/parsing error.
+         */
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                console.log(`Attempting ${method} ${API_BASE}${endpoint}`); // Debugging
+                const response = await fetch(`${API_BASE}${endpoint}`, options);
+                const result = await response.json(); // Always attempt to parse JSON
+
+                if (!response.ok) {
+                    // If the response was not OK (e.g., 400, 500 status)
+                    const errorMessage = result.error || result.message || `API Error: ${response.status} ${response.statusText}`;
+                    console.error('API Error Response:', result); // Log full error details
+                    showAlert(errorMessage, 'error', endpoint.includes('/donors') ? 'donorModalAlert' : endpoint.includes('/inventory') ? 'bloodModalAlert' : endpoint.includes('/requests') ? 'requestModalAlert' : null);
+                    return null; // Return null to indicate failure
+                }
+                
+                return result; // For successful responses, returns { success: true, data: ... } or { success: true, message: ... }
+
+            } catch (error) {
+                console.error('Network or Parsing Error:', error);
+                showAlert('Network error. Please check your internet connection or if the server is running.', 'error');
+                return null;
+            }
+        }
+
+        // --- Tab Management Functions ---
+
+        /**
+         * Handles switching between application tabs.
+         * @param {string} tabName - The ID of the tab content to display.
+         */
+        function switchTab(tabName) {
+            // Remove 'active' class from all tab content sections
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            // Remove 'active' class from all navigation buttons
+            document.querySelectorAll('.nav-tab').forEach(navTab => navTab.classList.remove('active'));
+
+            // Add 'active' class to the clicked tab's content and button
+            document.getElementById(tabName).classList.add('active');
+            document.querySelector(`.nav-tab[data-tab="${tabName}"]`).classList.add('active');
+
+            // Load data specific to the selected tab
+            loadTabData(tabName);
+        }
+
+        /**
+         * Loads and displays data for the currently active tab.
+         * @param {string} tabName - The name of the tab (e.g., 'dashboard', 'donors').
+         */
+        function loadTabData(tabName) {
+            console.log(`Loading data for: ${tabName} tab.`);
+            switch (tabName) {
                 case 'dashboard':
                     loadDashboard();
                     break;
                 case 'donors':
                     loadDonors();
                     break;
-                case 'recipients':
-                    loadRecipients();
-                    break;
                 case 'inventory':
                     loadInventory();
                     break;
-                case 'requests':
+                    case 'requests':
                     loadRequests();
+                    break;
+                case 'about':
+                    // Static content, no API call needed
+                    console.log('About tab activated. No dynamic data to load.');
                     break;
             }
         }
 
-        // Utility Functions
-        function showAlert(containerId, message, type = 'success') {
-            const container = document.getElementById(containerId);
-            container.innerHTML = `<div class="alert ${type}">${message}</div>`;
-            setTimeout(() => {
-                container.innerHTML = '';
-            }, 5000);
+        // --- Modal Management Functions ---
+
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex'; // Use flex to center
         }
 
-        function formatDate(dateString) {
-            return new Date(dateString).toLocaleDateString();
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            // Clear any alerts inside the modal when closing
+            const modalAlertDiv = document.getElementById(`${modalId}Alert`);
+            if (modalAlertDiv) modalAlertDiv.innerHTML = '';
         }
 
-        // API Functions
-        async function apiRequest(endpoint, method = 'GET', data = null) {
-            const options = {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            };
-            
-            if (data) {
-                options.body = JSON.stringify(data);
+        // Close modal when clicking outside content
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+                const modalAlertDiv = event.target.querySelector('[id$="ModalAlert"]');
+                if (modalAlertDiv) modalAlertDiv.innerHTML = '';
             }
-            
-            try {
-                const response = await fetch(`${API_BASE}${endpoint}`, options);
-                const result = await response.json();
-                
-                console.log('API Response Status:', response.status); // Debug log
-                console.log('API Response Body:', result); // Debug log
-                
-                if (!response.ok) {
-                    // Handle validation errors specifically
-                    if (result.details && Array.isArray(result.details)) {
-                        const validationErrors = result.details.map(detail => detail.msg).join(', ');
-                        throw new Error(`Validation failed: ${validationErrors}`);
-                    }
-                    throw new Error(result.error || `HTTP ${response.status}: Request failed`);
-                }
-                
-                return result;
-            } catch (error) {
-                console.error('API Error:', error);
-                throw error;
-            }
-        }
+        };
 
-        // Dashboard Functions
-async function loadDashboard() {
-    try {
-        // Use the stats endpoint from your backend
-        const statsResponse = await apiRequest('/stats');
-        const stats = statsResponse.data;
-        
-        // Update dashboard stats
-        document.getElementById('totalDonors').textContent = stats.totalDonors;
-        document.getElementById('totalRecipients').textContent = stats.totalRecipients;
-        document.getElementById('totalUnits').textContent = stats.totalUnits;
-        document.getElementById('pendingRequests').textContent = stats.pendingRequests;
-        
-        // Load inventory for blood type stats
-        const inventory = await apiRequest('/inventory');
-        displayBloodTypeStats(inventory);
-        
-    } catch (error) {
-        console.error('Failed to load dashboard:', error);
-        
-        // Fallback: try to load individual endpoints if stats endpoint fails
-        try {
-            const [donors, recipients, inventory, requests] = await Promise.all([
-                apiRequest('/donors'),
-                apiRequest('/recipients'),
-                apiRequest('/inventory'),
-                apiRequest('/requests')
-            ]);
-            
-            document.getElementById('totalDonors').textContent = donors.length;
-            document.getElementById('totalRecipients').textContent = recipients.length;
-            document.getElementById('totalUnits').textContent = inventory.reduce((sum, item) => sum + item.units, 0);
-            document.getElementById('pendingRequests').textContent = requests.filter(r => r.status === 'pending').length;
-            
-            displayBloodTypeStats(inventory);
-        } catch (fallbackError) {
-            console.error('Failed to load dashboard with fallback:', fallbackError);
-        }
-    }
-}
+        // --- Specific Data Loading and Rendering Functions ---
 
-        function displayBloodTypeStats(inventory) {
+        async function loadDashboard() {
+            // Fetch all required data in parallel
+            const statsRes = await apiCall('/stats');
+            const inventoryRes = await apiCall('/inventory');
+
+            // Ensure all calls were successful and have data
+            const stats = statsRes ? statsRes.data : {};
+            const inventory = inventoryRes ? inventoryRes.data : [];
+
+            // Update Dashboard Stats
+            document.getElementById('totalDonors').textContent = stats.totalDonors || 0;
+            document.getElementById('totalUnits').textContent = stats.totalUnits || 0;
+            document.getElementById('pendingRequests').textContent = stats.pendingRequests || 0;
+            document.getElementById('criticalLevels').textContent = stats.criticalLevels || 0;
+
+            // Calculate Inventory Overview Table (re-using inventory data from stats call)
             const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-            const stats = {};
-            
-            bloodTypes.forEach(type => {
-                stats[type] = inventory.filter(item => item.bloodType === type).reduce((sum, item) => sum + item.units, 0);
+            const bloodTypeUnits = {}; 
+
+            bloodTypes.forEach(type => bloodTypeUnits[type] = 0); // Initialize
+
+            inventory.forEach(item => {
+                if (item.status === 'available' && bloodTypes.includes(item.bloodType)) {
+                    bloodTypeUnits[item.bloodType] += item.units;
+                }
             });
-            
-            const container = document.getElementById('bloodTypeStats');
-            container.innerHTML = bloodTypes.map(type => `
-                <div class="card">
-                    <div class="blood-type">${type}</div>
-                    <h3>${stats[type]} Units</h3>
-                    <div class="status ${stats[type] > 10 ? 'available' : stats[type] > 5 ? 'critical' : 'out-of-stock'}">
-                        ${stats[type] > 10 ? 'Available' : stats[type] > 5 ? 'Critical' : 'Out of Stock'}
-                    </div>
-                </div>
-            `).join('');
+
+            const inventoryOverviewTbody = document.getElementById('inventoryOverview');
+            inventoryOverviewTbody.innerHTML = ''; // Clear previous data
+
+            bloodTypes.forEach(type => {
+                const units = bloodTypeUnits[type];
+                let status = 'Available';
+                let statusClass = 'available';
+
+                if (units <= 2) {
+                    status = 'Critical';
+                    statusClass = 'critical';
+                } else if (units <= 5) {
+                    status = 'Low';
+                    statusClass = 'low';
+                }
+
+                const row = `
+                    <tr>
+                        <td><span class="blood-type">${type}</span></td>
+                        <td>${units}</td>
+                        <td><span class="status ${statusClass}">${status}</span></td>
+                        <td>${formatReadableDate(new Date())}</td>
+                    </tr>
+                `;
+                inventoryOverviewTbody.insertAdjacentHTML('beforeend', row);
+            });
         }
 
-        // Donor Functions
         async function loadDonors() {
-            try {
-                const donors = await apiRequest('/donors');
-                displayDonors(donors);
-            } catch (error) {
-                console.error('Failed to load donors:', error);
+            const tbody = document.getElementById('donorsTable');
+            tbody.innerHTML = '<tr><td colspan="7" class="alert alert-info" style="text-align: center;">Loading donors...</td></tr>';
+            const result = await apiCall('/donors');
+            if (!result || !result.success) {
+                tbody.innerHTML = '<tr><td colspan="7" class="alert alert-error" style="text-align: center;">Failed to load donors. Please check the server and try again.</td></tr>';
+                return;
             }
-        }
+            const donors = result.data; // Access the 'data' property
 
-        function displayDonors(donors) {
-            const container = document.getElementById('donorsList');
-            container.innerHTML = donors.map(donor => `
-                <div class="card">
-                    <h3>${donor.name}</h3>
-                    <div class="blood-type">${donor.bloodType}</div>
-                    <p><strong>Age:</strong> ${donor.age}</p>
-                    <p><strong>Phone:</strong> ${donor.phone}</p>
-                    <p><strong>Email:</strong> ${donor.email}</p>
-                    <p><strong>Address:</strong> ${donor.address}</p>
-                    <p><strong>Registered:</strong> ${formatDate(donor.createdAt)}</p>
-                </div>
+            if (donors.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="alert alert-info" style="text-align: center;">No donors registered yet. Click "Add New Donor" to begin!</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = donors.map(donor => `
+                <tr>
+                    <td><small>${shortenId(donor._id)}</small></td>
+                    <td>${donor.name}</td>
+                    <td><span class="blood-type">${donor.bloodType}</span></td>
+                    <td>${donor.phone}</td>
+                    <td>${donor.email}</td>
+                    <td>${formatReadableDate(donor.lastDonation)}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteDonor('${donor._id}')">Delete</button>
+                    </td>
+                </tr>
             `).join('');
         }
 
-        // Recipient Functions
-        async function loadRecipients() {
-            try {
-                const recipients = await apiRequest('/recipients');
-                displayRecipients(recipients);
-            } catch (error) {
-                console.error('Failed to load recipients:', error);
-            }
-        }
-
-        function displayRecipients(recipients) {
-            const container = document.getElementById('recipientsList');
-            container.innerHTML = recipients.map(recipient => `
-                <div class="card">
-                    <h3>${recipient.name}</h3>
-                    <div class="blood-type">${recipient.bloodType}</div>
-                    <p><strong>Age:</strong> ${recipient.age}</p>
-                    <p><strong>Phone:</strong> ${recipient.phone}</p>
-                    <p><strong>Hospital:</strong> ${recipient.hospital}</p>
-                    <p><strong>Units Required:</strong> ${recipient.unitsRequired}</p>
-                    <p><strong>Urgency:</strong> ${recipient.urgency}</p>
-                    <p><strong>Registered:</strong> ${formatDate(recipient.createdAt)}</p>
-                </div>
-            `).join('');
-        }
-
-        // Inventory Functions
         async function loadInventory() {
-            try {
-                const inventory = await apiRequest('/inventory');
-                displayInventory(inventory);
-            } catch (error) {
-                console.error('Failed to load inventory:', error);
+            const tbody = document.getElementById('inventoryTable');
+            tbody.innerHTML = '<tr><td colspan="7" class="alert alert-info" style="text-align: center;">Loading inventory...</td></tr>';
+            const result = await apiCall('/inventory');
+            if (!result || !result.success) {
+                tbody.innerHTML = '<tr><td colspan="7" class="alert alert-error" style="text-align: center;">Failed to load inventory. Please check the server and try again.</td></tr>';
+                return;
             }
-        }
+            const inventory = result.data; // Access the 'data' property
 
-        function displayInventory(inventory) {
-            const container = document.getElementById('inventoryList');
-            container.innerHTML = inventory.map(item => `
-                <div class="card">
-                    <h3>Blood Type: ${item.bloodType}</h3>
-                    <p><strong>Units:</strong> ${item.units}</p>
-                    <p><strong>Expiry Date:</strong> ${formatDate(item.expiryDate)}</p>
-                    <p><strong>Added:</strong> ${formatDate(item.createdAt)}</p>
-                </div>
+            if (inventory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="alert alert-info" style="text-align: center;">No blood units in inventory. Add some using "Add Blood Unit".</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = inventory.map(item => `
+                <tr>
+                    <td><span class="blood-type">${item.bloodType}</span></td>
+                    <td>${item.units}</td>
+                    <td>${item.donorId ? item.donorId.name : 'N/A'}</td> <td>${formatReadableDate(item.collectionDate)}</td>
+                    <td>${formatReadableDate(item.expiryDate)}</td>
+                    <td><span class="status ${item.status.toLowerCase()}">${item.status}</span></td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteBloodUnit('${item._id}')">Delete</button>
+                    </td>
+                </tr>
             `).join('');
         }
 
-        // Request Functions
         async function loadRequests() {
-            try {
-                const requests = await apiRequest('/requests');
-                displayRequests(requests);
-            } catch (error) {
-                console.error('Failed to load requests:', error);
+            const tbody = document.getElementById('requestsTable');
+            tbody.innerHTML = '<tr><td colspan="7" class="alert alert-info" style="text-align: center;">Loading requests...</td></tr>';
+            const result = await apiCall('/requests');
+            if (!result || !result.success) {
+                tbody.innerHTML = '<tr><td colspan="7" class="alert alert-error" style="text-align: center;">Failed to load requests. Please check the server and try again.</td></tr>';
+                return;
             }
-        }
+            const requests = result.data; // Access the 'data' property
 
-        function displayRequests(requests) {
-            const container = document.getElementById('requestsList');
-            container.innerHTML = requests.map(request => `
-                <div class="card">
-                    <h3>${request.recipientName}</h3>
-                    <div class="blood-type">${request.bloodType}</div>
-                    <p><strong>Units:</strong> ${request.units}</p>
-                    <p><strong>Hospital:</strong> ${request.hospital}</p>
-                    <p><strong>Urgency:</strong> ${request.urgency}</p>
-                    <p><strong>Status:</strong> ${request.status}</p>
-                    <p><strong>Requested:</strong> ${formatDate(request.createdAt)}</p>
-                    ${request.status === 'pending' ? `
-                        <button class="btn" onclick="approveRequest('${request._id}')">Approve</button>
-                        <button class="btn btn-secondary" onclick="rejectRequest('${request._id}')">Reject</button>
-                    ` : ''}
-                </div>
+            if (requests.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="alert alert-info" style="text-align: center;">No pending blood requests. Click "New Request" to add one.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = requests.map(request => `
+                <tr>
+                    <td>${request.patientName}</td>
+                    <td><span class="blood-type">${request.bloodType}</span></td>
+                    <td>${request.units}</td>
+                    <td>${request.hospital}</td>
+                    <td><span class="status ${request.priority.toLowerCase()}">${request.priority}</span></td>
+                    <td><span class="status ${request.status.toLowerCase()}">${request.status}</span></td>
+                    <td>
+                        ${request.status === 'pending' ?
+                            `<button class="btn" onclick="fulfillRequest('${request._id}')">Fulfill</button>` :
+                            ''
+                        }
+                        <button class="btn btn-danger" onclick="deleteRequest('${request._id}')">Delete</button>
+                    </td>
+                </tr>
             `).join('');
         }
 
-        async function approveRequest(requestId) {
-            try {
-                await apiRequest(`/requests/${requestId}/approve`, 'PUT');
-                showAlert('requestsAlert', 'Request approved successfully!');
-                loadRequests();
-                loadDashboard();
-            } catch (error) {
-                showAlert('requestsAlert', error.message, 'error');
-            }
-        }
+        // --- Form Submission Handlers ---
 
-        async function rejectRequest(requestId) {
-            try {
-                await apiRequest(`/requests/${requestId}/reject`, 'PUT');
-                showAlert('requestsAlert', 'Request rejected successfully!');
-                loadRequests();
-                loadDashboard();
-            } catch (error) {
-                showAlert('requestsAlert', error.message, 'error');
-            }
-        }
-
-        // Form Handlers
-document.getElementById('donorForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const formData = {
-        name: document.getElementById('donorName').value.trim(),
-        age: parseInt(document.getElementById('donorAge').value),
-        bloodType: document.getElementById('donorBloodType').value,
-        phone: document.getElementById('donorPhone').value.trim(),
-        email: document.getElementById('donorEmail').value.trim().toLowerCase(),
-        address: document.getElementById('donorAddress').value.trim()
-    };
-    
-    // Client-side validation before sending
-    const errors = [];
-    
-    if (formData.name.length < 2 || formData.name.length > 100) {
-        errors.push('Name must be between 2 and 100 characters');
-    }
-    
-    if (formData.age < 18 || formData.age > 65) {
-        errors.push('Age must be between 18 and 65');
-    }
-    
-    const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-    if (!bloodTypes.includes(formData.bloodType)) {
-        errors.push('Please select a valid blood type');
-    }
-    
-    if (formData.phone.length < 10 || formData.phone.length > 15) {
-        errors.push('Phone number must be between 10 and 15 characters');
-    }
-    
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-        errors.push('Please enter a valid email address');
-    }
-    
-    if (formData.address.length < 10 || formData.address.length > 200) {
-        errors.push('Address must be between 10 and 200 characters');
-    }
-    
-    if (errors.length > 0) {
-        showAlert('donorAlert', 'Validation errors: ' + errors.join(', '), 'error');
-        return;
-    }
-    
-    try {
-        console.log('Sending donor data:', formData); // Debug log
-        const response = await apiRequest('/donors', 'POST', formData);
-        console.log('Response:', response); // Debug log
-        
-        showAlert('donorAlert', 'Donor registered successfully!');
-        e.target.reset();
-        loadDonors();
-        loadDashboard();
-    } catch (error) {
-        console.error('Error details:', error); // Debug log
-        
-        // Enhanced error handling
-        if (error.message && error.message.includes('validation')) {
-            showAlert('donorAlert', `Validation failed. Please check all fields and try again. Error: ${error.message}`, 'error');
-        } else if (error.message && error.message.includes('email already exists')) {
-            showAlert('donorAlert', 'A donor with this email address already exists.', 'error');
-        } else {
-            showAlert('donorAlert', `Failed to register donor: ${error.message}`, 'error');
-        }
-    }
-});
-
-        document.getElementById('recipientForm').addEventListener('submit', async (e) => {
+        document.getElementById('donorForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const formData = {
-                name: document.getElementById('recipientName').value,
-                age: parseInt(document.getElementById('recipientAge').value),
-                bloodType: document.getElementById('recipientBloodType').value,
-                phone: document.getElementById('recipientPhone').value,
-                hospital: document.getElementById('recipientHospital').value,
-                unitsRequired: parseInt(document.getElementById('recipientUnits').value),
-                urgency: document.getElementById('recipientUrgency').value
+            const donorData = {
+                name: document.getElementById('donorName').value.trim(),
+                age: parseInt(document.getElementById('donorAge').value), // Added age
+                bloodType: document.getElementById('donorBloodType').value,
+                phone: document.getElementById('donorPhone').value.trim(),
+                email: document.getElementById('donorEmail').value.trim().toLowerCase(),
+                address: document.getElementById('donorAddress').value.trim()
             };
-            
-            try {
-                await apiRequest('/recipients', 'POST', formData);
-                showAlert('recipientAlert', 'Recipient registered successfully!');
-                e.target.reset();
-                loadRecipients();
+            const result = await apiCall('/donors', 'POST', donorData);
+            if (result && result.success) {
+                showAlert('Donor added successfully!', 'success');
+                closeModal('donorModal');
+                document.getElementById('donorForm').reset();
+                loadDonors();
                 loadDashboard();
-            } catch (error) {
-                showAlert('recipientAlert', error.message, 'error');
+            } else if (result && result.error) {
+                showAlert(result.error, 'error', 'donorModalAlert');
+            } else {
+                showAlert('Failed to add donor. Please try again.', 'error', 'donorModalAlert');
             }
         });
 
-        document.getElementById('inventoryForm').addEventListener('submit', async (e) => {
+        document.getElementById('bloodForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const formData = {
-                bloodType: document.getElementById('inventoryBloodType').value,
-                units: parseInt(document.getElementById('inventoryUnits').value),
-                expiryDate: document.getElementById('inventoryExpiryDate').value
+            const bloodData = {
+                bloodType: document.getElementById('bloodType').value,
+                units: parseInt(document.getElementById('bloodUnits').value),
+                donorId: document.getElementById('donorSelect').value,
+                collectionDate: document.getElementById('collectionDate').value,
+                expiryDate: document.getElementById('expiryDate').value
             };
-            
-            try {
-                await apiRequest('/inventory', 'POST', formData);
-                showAlert('inventoryAlert', 'Blood units added to inventory successfully!');
-                e.target.reset();
+            const result = await apiCall('/inventory', 'POST', bloodData);
+            if (result && result.success) {
+                showAlert('Blood unit added successfully!', 'success');
+                closeModal('bloodModal');
+                document.getElementById('bloodForm').reset();
                 loadInventory();
                 loadDashboard();
-            } catch (error) {
-                showAlert('inventoryAlert', error.message, 'error');
+            } else if (result && result.error) {
+                showAlert(result.error, 'error', 'bloodModalAlert');
+            } else {
+                showAlert('Failed to add blood unit. Please try again.', 'error', 'bloodModalAlert');
             }
         });
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadDashboard();
+        document.getElementById('requestForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const requestData = {
+                patientName: document.getElementById('patientName').value.trim(),
+                bloodType: document.getElementById('requestBloodType').value,
+                units: parseInt(document.getElementById('unitsNeeded').value),
+                priority: document.getElementById('priority').value,
+                hospital: document.getElementById('hospital').value.trim()
+            };
+            const result = await apiCall('/requests', 'POST', requestData);
+            if (result && result.success) {
+                showAlert('Request submitted successfully!', 'success');
+                closeModal('requestModal');
+                document.getElementById('requestForm').reset();
+                loadRequests();
+                loadDashboard();
+            } else if (result && result.error) {
+                showAlert(result.error, 'error', 'requestModalAlert');
+            } else {
+                showAlert('Failed to submit request. Please try again.', 'error', 'requestModalAlert');
+            }
         });
+
+        // --- Action Handlers (Delete, Fulfill) ---
+
+        async function deleteDonor(id) {
+            if (confirm('Are you sure you want to delete this donor? This action cannot be undone.')) {
+                const result = await apiCall(`/donors/${id}`, 'DELETE');
+                if (result && result.success) {
+                    showAlert('Donor deleted successfully!', 'success');
+                    loadDonors();
+                    loadDashboard();
+                } else if (result && result.error) {
+                    showAlert(result.error, 'error');
+                } else {
+                    showAlert('Failed to delete donor. Please try again.', 'error');
+                }
+            }
+        }
+
+        async function deleteBloodUnit(id) {
+            if (confirm('Are you sure you want to delete this blood unit?')) {
+                const result = await apiCall(`/inventory/${id}`, 'DELETE');
+                if (result && result.success) {
+                    showAlert('Blood unit deleted successfully!', 'success');
+                    loadInventory();
+                    loadDashboard();
+                } else if (result && result.error) {
+                    showAlert(result.error, 'error');
+                } else {
+                    showAlert('Failed to delete blood unit. Please try again.', 'error');
+                }
+            }
+        }
+
+        async function deleteRequest(id) {
+            if (confirm('Are you sure you want to delete this request? This will not revert inventory changes if already fulfilled.')) {
+                const result = await apiCall(`/requests/${id}`, 'DELETE');
+                if (result && result.success) {
+                    showAlert('Request deleted successfully!', 'success');
+                    loadRequests();
+                    loadDashboard();
+                } else if (result && result.error) {
+                    showAlert(result.error, 'error');
+                } else {
+                    showAlert('Failed to delete request. Please try again.', 'error');
+                }
+            }
+        }
+
+        async function fulfillRequest(id) {
+            if (confirm('Are you sure you want to mark this request as fulfilled? This will deduct units from inventory.')) {
+                // Ensure backend has /api/requests/:id/approve endpoint
+                const result = await apiCall(`/requests/${id}/approve`, 'PUT', {}); // Pass empty body if backend expects one
+                if (result && result.success) {
+                    showAlert('Request fulfilled successfully! Inventory updated.', 'success');
+                    loadRequests();
+                    loadInventory();
+                    loadDashboard();
+                } else if (result && result.error) {
+                    showAlert(`Failed to fulfill request: ${result.error}`, 'error');
+                } else {
+                    showAlert('Failed to fulfill request. Please try again.', 'error');
+                }
+            }
+        }
+
+        // --- Search Functionality ---
+        function setupSearch(inputId, tableId, columnsToSearch) {
+            document.getElementById(inputId).addEventListener('keyup', function() {
+                const searchTerm = this.value.toLowerCase();
+                const table = document.getElementById(tableId);
+                const rows = table.querySelectorAll('tbody tr');
+
+                rows.forEach(row => {
+                    let match = false;
+                    if (row.querySelector('.alert')) { // Skip info/loading rows
+                        row.style.display = 'none';
+                        return;
+                    }
+
+                    for (const colIndex of columnsToSearch) {
+                        const cell = row.children[colIndex];
+                        if (cell && cell.textContent.toLowerCase().includes(searchTerm)) {
+                            match = true;
+                            break;
+                        }
+                    }
+                    row.style.display = match ? '' : 'none';
+                });
+            });
+        }
+
+        async function loadDonorDropdown() {
+            const select = document.getElementById('donorSelect');
+            select.innerHTML = '<option value="">Loading Donors...</option>';
+            const result = await apiCall('/donors');
+            if (result && result.success) {
+                const donors = result.data;
+                if (donors.length > 0) {
+                    select.innerHTML = '<option value="">Select Donor</option>' +
+                        donors.map(donor =>
+                            `<option value="${donor._id}">${donor.name} (${donor.bloodType}) - ${donor.phone}</option>`
+                        ).join('');
+                } else {
+                    select.innerHTML = '<option value="">No donors available</option>';
+                }
+            } else {
+                select.innerHTML = '<option value="">Failed to load donors</option>';
+            }
+        }
+
+
+        // --- Initialization ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Setup navigation tab clicks
+            document.querySelectorAll('.nav-tab').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    switchTab(event.target.dataset.tab);
+                });
+            });
+
+            // Setup modal trigger buttons
+            document.getElementById('addDonorBtn').addEventListener('click', () => showModal('donorModal'));
+            document.getElementById('addBloodUnitBtn').addEventListener('click', () => {
+                showModal('bloodModal');
+                loadDonorDropdown(); // Load donors when opening the blood unit modal
+            });
+            document.getElementById('newRequestBtn').addEventListener('click', () => showModal('requestModal'));
+
+            // Setup modal close buttons (using data-modal-id attribute)
+            document.querySelectorAll('.modal .close').forEach(closeBtn => {
+                closeBtn.addEventListener('click', (event) => {
+                    closeModal(event.target.dataset.modalId);
+                });
+            });
+
+            // Set default date for collectionDate (today) and min for expiryDate (today)
+            const today = new Date().toISOString().split('T')[0];
+            const collectionDateInput = document.getElementById('collectionDate');
+            if (collectionDateInput) {
+                collectionDateInput.value = today;
+                collectionDateInput.max = today; // Cannot select future date for collection
+            }
+            const expiryDateInput = document.getElementById('expiryDate');
+            if (expiryDateInput) {
+                expiryDateInput.min = today; // Expiry date cannot be before today
+            }
+
+            // Setup search functionality for donors table
+            setupSearch('donorSearch', 'donorsTable', [1, 2, 3, 4]); // Search Name, Blood Type, Phone, Email
+
+            // Load the initial dashboard data
+            switchTab('dashboard'); // Activates dashboard and calls loadDashboard()
+        });
+
     </script>
 </body>
 </html>
