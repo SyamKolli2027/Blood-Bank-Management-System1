@@ -1,7 +1,7 @@
     // API Base URL - THIS IS CRUCIAL. Ensure it's correct for your backend.
     // If you are running YOUR OWN server.js locally, this should be 'http://localhost:3000/api'.
     // If you are relying on your friend's online Render.com deployment, keep it as below.
-    const API_BASE = 'http://localhost:3000/api'; // Changed to local to match the server.js I provided
+const API_BASE = "/api"; // ✅ Works on both localhost and Render
 
 
         // --- Helper Functions for UI and Data Handling ---
